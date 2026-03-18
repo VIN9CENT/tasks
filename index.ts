@@ -2,7 +2,8 @@ import express, { Request, Response } from "express";
 
 interface Task {
   id: number;
-  title: string;
+  summary: string;
+  details: string;
   completed: boolean;
 }
 
@@ -12,9 +13,20 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 
 let tasks: Task[] = [
-  { id: 1, title: "Learn TypeScript", completed: false },
-  { id: 2, title: "Build Express Server", completed: true },
+  {
+    id: 1,
+    summary: "Learn TypeScript",
+    details: "Learn the basics of TypeScript",
+    completed: false,
+  },
+  {
+    id: 2,
+    summary: "Build Express Server",
+    details: "Create a simple Express server",
+    completed: true,
+  },
 ];
+let nextId = tasks.length + 1;
 
 app.get("/tasks", (req: Request, res: Response) => {
   res.json(tasks);
@@ -32,18 +44,18 @@ app.get("/tasks/:id", (req: Request<{ id: string }>, res: Response) => {
 
 // 3. POST
 app.post("/tasks", (req: Request, res: Response) => {
-  const { title } = req.body;
+  const { summary, details } = req.body;
 
   const newTask: Task = {
-    id: tasks.length + 1,
-    title,
+    id: nextId++,
+    summary,
+    details,
     completed: false,
   };
 
   tasks.push(newTask);
   res.status(201).json(newTask);
 });
-
 
 // 4. PUT
 app.put("/tasks/:id", (req: Request<{ id: string }>, res: Response) => {
