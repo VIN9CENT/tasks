@@ -1,7 +1,7 @@
-#Task Management API (Express + TypeScript)
+# Task Management API (Express + TypeScript)
 
 A simple, in-memory RESTful API built with Node.js, Express, and TypeScript to manage a list of tasks.
-##🚀 Features
+## 🚀 Features
 
 * CRUD Operations: Create, Read, Update, and Delete tasks.
 
@@ -9,7 +9,7 @@ A simple, in-memory RESTful API built with Node.js, Express, and TypeScript to m
 
 * In-Memory Storage: Uses a local array to store data (resets when the server restarts).
 
-##🛠️ Prerequisites
+## 🛠️ Prerequisites
 
 * Before running this project, ensure you have the following installed:
 
@@ -17,7 +17,7 @@ A simple, in-memory RESTful API built with Node.js, Express, and TypeScript to m
 
 * npm (comes with Node)
 
-##📦 Installation & Setup
+## 📦 Installation & Setup
 
 1. Initialize the project:
 `code`
@@ -42,7 +42,7 @@ A simple, in-memory RESTful API built with Node.js, Express, and TypeScript to m
    
 Save your code as index.ts.
 
-##🏃 Running the Server
+## 🏃 Running the Server
 
 **To start the server in development mode, run:**
 `code`
