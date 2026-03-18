@@ -19,6 +19,16 @@ let tasks: Task[] = [
 app.get("/tasks", (req: Request, res: Response) => {
   res.json(tasks);
 });
+app.get("/tasks/:id", (req: Request<{ id: string }>, res: Response) => {
+  const id = parseInt(req.params.id);
+  const task = tasks.find((t) => t.id === id);
+
+  if (!task) {
+    return res.status(404).json({ message: "Task not found" });
+  }
+
+  res.json(task);
+});
 
 // 3. POST
 app.post("/tasks", (req: Request, res: Response) => {
@@ -33,6 +43,7 @@ app.post("/tasks", (req: Request, res: Response) => {
   tasks.push(newTask);
   res.status(201).json(newTask);
 });
+
 
 // 4. PUT
 app.put("/tasks/:id", (req: Request<{ id: string }>, res: Response) => {
