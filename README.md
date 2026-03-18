@@ -1,10 +1,16 @@
 # Task Management REST API
 
-## Description
+## 📝Description
 
 This is a lightweight RESTful API built using Node.js, Express, and TypeScript. It allows users to manage a "To-Do" list by performing CRUD (Create, Read, Update, Delete) operations on tasks stored in an in-memory array. This project demonstrates basic API routing, TypeScript interface implementation, and request handling in a backend environment.
 
-## Requirements
+## 🚀 Features
+
+- CRUD Operations: Create, Read, Update, and Delete tasks.
+- Type Safety: Built with TypeScript for a better developer experience and error catching.
+- In-Memory Storage: Uses a local array to store data (resets when the server restarts).
+- 
+## 🛠️Requirements
 To run this project, you need the following installed on your local machine:
 
 - **Node.js**: Version 14.x or higher
@@ -12,7 +18,7 @@ To run this project, you need the following installed on your local machine:
 - **TypeScript**: Installed globally or as a dev dependency
 - **Terminal/Command Line**: To execute commands and test endpoints
 
-## Installation
+## 📦 Installation
 Follow these steps to get your development environment running:
 
 1. **Clone or create the project folder:**
@@ -42,7 +48,7 @@ Follow these steps to get your development environment running:
 `npx tsx index.ts`
 
 The server will start at [http://localhost:3000]
-## API Endpoints:
+## 📑API Endpoints:
 
 GET /tasks - Retrieve all tasks.
 
