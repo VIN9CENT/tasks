@@ -25,6 +25,12 @@ let tasks: Task[] = [
     details: "Create a simple Express server",
     completed: true,
   },
+  {
+    id: 3,
+    summary: "Finish Assignment",
+    details: "Finish document my API using Swagger",
+    completed: false,
+  },
 ];
 let nextId = tasks.length + 1;
 
@@ -83,6 +89,24 @@ app.delete("/tasks/:id", (req: Request<{ id: string }>, res: Response) => {
   tasks = tasks.filter((t) => t.id !== id);
 
   res.status(200).json({ message: `Task ${id} deleted successfully` });
+});
+
+//6 PATCH
+app.patch("/tasks/:id", (req: Request<{ id: string }>, res: Response) => {
+  const id = parseInt(req.params.id);
+  const task = tasks.find((t) => t.id === id);
+
+  if (!task) {
+    return res.status(404).json({ message: "Task not found" });
+  }
+
+  const { summary, details, completed } = req.body;
+
+  if (summary !== undefined) task.summary = summary;
+  if (details !== undefined) task.details = details;
+  if (completed !== undefined) task.completed = completed;
+
+  res.json(task);
 });
 
 app.listen(PORT, () => {
