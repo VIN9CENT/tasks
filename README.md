@@ -3,19 +3,19 @@
 A simple, in-memory RESTful API built with Node.js, Express, and TypeScript to manage a list of tasks.
 ##🚀 Features
 
-*CRUD Operations: Create, Read, Update, and Delete tasks.
+* CRUD Operations: Create, Read, Update, and Delete tasks.
 
-*Type Safety: Built with TypeScript for a better developer experience and error catching.
+* Type Safety: Built with TypeScript for a better developer experience and error catching.
 
-*In-Memory Storage: Uses a local array to store data (resets when the server restarts).
+* In-Memory Storage: Uses a local array to store data (resets when the server restarts).
 
 ##🛠️ Prerequisites
 
-*Before running this project, ensure you have the following installed:
+* Before running this project, ensure you have the following installed:
 
-*Node.js (v14 or higher)
+* Node.js (v14 or higher)
 
-*npm (comes with Node)
+* npm (comes with Node)
 
 ##📦 Installation & Setup
 
