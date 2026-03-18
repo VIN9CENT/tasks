@@ -34,12 +34,13 @@ Follow these steps to get your development environment running:
 `code`
 `Bash`
 `npx tsx --init`
-**Usage**
-4. Start the Server:
+## Usage
+### Start the Server:
 **Run the following command in your terminal:**
 `code`
 `Bash`
 `npx tsx index.ts`
+
 The server will start at [http://localhost:3000]
 ## API Endpoints:
 
