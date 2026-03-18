@@ -63,11 +63,11 @@ DELETE /tasks/:id - Remove a task by ID.
 * Open a Pull Request.
 ## Authors & Acknowledgement
 1. Vincent Ochieng- Developer - [https://github.com/VIN9CENT]
-Thanks to the Express.js and TypeScript documentation for guidance.
-Huge thanks to my technical instructor, Silvanos Eric
+- Thanks to the Express.js and TypeScript documentation for guidance.
+- Huge thanks to my technical instructor, Silvanos Eric
 ## License
 This project is licensed under the MIT License - see the LICENSE file for details.
 ## Deployment
-Remote Repository: [https://github.com/VIN9CENT/tasks]
-Repository Status: Public
-Collaborator Invitations: Sent to evaluator.
+- Remote Repository: [https://github.com/VIN9CENT/tasks]
+- Repository Status: Public
+- Collaborator Invitations: Sent to evaluator.
