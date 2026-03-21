@@ -22,29 +22,38 @@ To run this project, you need the following installed on your local machine:
 Follow these steps to get your development environment running:
 
 1. **Clone or create the project folder:**
+      i. To create the project folder:
    ```
-   bash
    mkdir task_manager
    cd task_manager
    ```
 1. Initialize the project:
-`code`
-`Bash`
+
 `npm init -y`
 2. Install Dependencies:
-`code`
-`Bash`
-`npm install express`
+
+`npm install express.`
 `npm install -D typescript ts-node @types/node @types/express`
 3. Initialize TypeScript:
-`code`
-`Bash`
+
 `npx tsx --init`
+
+   ii. To clone the project folder:
+Follow these steps to clone the repository and set up the project:
+
+1. **Clone the repository:**
+  ```
+git clone https://github.com/VIN9CENT/tasks.git
+cd tasks
+```
+Install Dependencies:
+This will install all necessary packages (Express, TypeScript, etc.) listed in the package.json file:
+`npm install`
+Initialize TypeScript (Only if needed):
+`npx tsc --init`
 ## Usage
 ### Start the Server:
 **Run the following command in your terminal:**
-`code`
-`Bash`
 `npx tsx index.ts`
 
 The server will start at [http://localhost:3000]
