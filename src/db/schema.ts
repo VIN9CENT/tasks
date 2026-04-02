@@ -8,7 +8,7 @@ import {
   integer,
   unique,
 } from "drizzle-orm/pg-core";
-import { relations } from 'drizzle-orm';
+import { relations } from "drizzle-orm";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -50,9 +50,11 @@ export const taskTags = pgTable(
   (table) => [unique("task_tags_task_id_tag_id").on(table.taskId, table.tagId)],
 );
 
-
-
-export const tasksRelations = relations(tasks, ({ many }) => ({
+export const tasksRelations = relations(tasks, ({ one, many }) => ({
+  user: one(users, {
+    fields: [tasks.userId],
+    references: [users.id],
+  }),
   taskTags: many(taskTags),
 }));
 
@@ -69,4 +71,8 @@ export const taskTagsRelations = relations(taskTags, ({ one }) => ({
     fields: [taskTags.tagId],
     references: [tags.id],
   }),
+}));
+
+export const usersRelations = relations(users, ({ many }) => ({
+  tasks: many(tasks),
 }));

@@ -105,6 +105,50 @@ app.delete("/tasks/:id", async (req: Request, res: Response) => {
   }
 });
 
+//GET USERS
+
+app.get("/users", async (req: Request, res: Response) => {
+  try {
+    const allUsers = await db.query.users.findMany();
+
+    res.status(200).json(allUsers);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Failed to fetch users" });
+  }
+});
+
+//GET USER BY ID + TASKS
+app.get("/users/:id/tasks", async (req: Request, res: Response) => {
+  const userId = req.params.id as string;
+
+  try {
+    const userWithTasks = await db.query.users.findFirst({
+      where: (users, { eq }) => eq(users.id, userId),
+      with: {
+        tasks: {
+          with: {
+            taskTags: {
+              with: {
+                tag: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!userWithTasks) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json(userWithTasks);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
