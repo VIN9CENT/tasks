@@ -1,3 +1,4 @@
+import "dotenv/config";
 import { db } from "./connection";
 import { users, taskTags, tasks, tags } from "./schema";
 
@@ -16,10 +17,30 @@ async function seed() {
     const [demoUser] = await db
       .insert(users)
       .values([
-        { name: "Reduzer Technologies", age: 21 },
-        { name: "John Doe", age: 18 },
-        { name: "Jane Doe", age: 26 },
-        { name: "Alice Kiunjuri", age: 30 },
+        {
+          name: "Reduzer Technologies",
+          age: 21,
+          email: "reduzer@example.com",
+          password: "hashed_password",
+        },
+        {
+          name: "John Doe",
+          age: 18,
+          email: "john@example.com",
+          password: "hashed_password",
+        },
+        {
+          name: "Jane Doe",
+          age: 26,
+          email: "jane@example.com",
+          password: "hashed_password",
+        },
+        {
+          name: "Alice Kiunjuri",
+          age: 30,
+          email: "alice@example.com",
+          password: "hashed_password",
+        },
       ])
       .returning();
 

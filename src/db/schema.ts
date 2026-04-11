@@ -1,6 +1,5 @@
 import {
   pgTable,
-  pgEnum,
   uuid,
   varchar,
   text,
@@ -9,10 +8,14 @@ import {
   unique,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import * as z from "zod";
 
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 100 }).notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  password: varchar("password", { length: 255 }).notNull(),
   age: integer("age").notNull(),
 });
 
@@ -28,11 +31,9 @@ export const tasks = pgTable("tasks", {
     }),
 });
 
-export const tagNameEnum = pgEnum("tag_name", ["UI/UX", "FE", "BE", "DevOps"]);
-
 export const tags = pgTable("tags", {
   id: uuid("id").primaryKey().defaultRandom(),
-  name: tagNameEnum(),
+  name: varchar("name", { length: 20 }).unique().notNull(),
   color: varchar("color", { length: 50 }).notNull(),
 });
 
@@ -76,3 +77,78 @@ export const taskTagsRelations = relations(taskTags, ({ one }) => ({
 export const usersRelations = relations(users, ({ many }) => ({
   tasks: many(tasks),
 }));
+
+//inserting user schema
+export const insertUserSchema = createInsertSchema(users)
+  .extend({
+    name: z.string().min(1, "Name cannot be empty"),
+    email: z.email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    age: z.number().min(18, "Must be at least 18 years old"),
+  })
+  .omit({ id: true });
+
+export type NewUser = z.infer<typeof insertUserSchema>;
+//updating User Schema
+export const updateUserSchema = createInsertSchema(users)
+  .extend({
+    name: z.string().min(1, "Name cannot be empty"),
+    email: z.email("Invalid email address"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
+    age: z.number().min(18, "Must be at least 18 years old"),
+  })
+  .partial()
+  .extend({
+    id: z.string(),
+  });
+
+export const idSchema = createSelectSchema(users).pick({ id: true });
+
+export type UpdateUser = z.infer<typeof updateUserSchema>;
+export type UserId = z.infer<typeof idSchema>;
+
+// Tasks Schema
+export const insertTaskSchema = createInsertSchema(tasks).extend({
+  summary: z.string().min(1, "Summary cannot be empty"),
+  details: z.string().min(1, "Details cannot be empty"),
+  completed: z.boolean(),
+  userId: z.string(),
+});
+
+export const updateTaskSchema = createInsertSchema(tasks)
+  .extend({
+    summary: z.string().min(1, "Summary cannot be empty"),
+    details: z.string().min(1, "Details cannot be empty"),
+    completed: z.boolean(),
+    userId: z.string(),
+  })
+  .partial()
+  .extend({
+    id: z.string(),
+  });
+
+export const taskIdSchema = createSelectSchema(tasks).pick({ id: true });
+
+export type NewTask = Omit<typeof tasks.$inferInsert, "id">;
+export type UpdateTask = z.infer<typeof updateTaskSchema>;
+export type TaskId = z.infer<typeof taskIdSchema>;
+
+export const loginSchema = createSelectSchema(users)
+  .pick({
+    email: true,
+    password: true,
+  })
+  .extend({
+    email: z.email(),
+    password: z.string(),
+  });
+export const createTagSchema = z.object({
+  name: z.string().min(3, "Tag name must be at least 3 characters").max(50),
+  color: z
+    .string()
+    .regex(
+      /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/,
+      "Color must be a valid hex code",
+    ),
+});
+export type Login = z.infer<typeof loginSchema>;
