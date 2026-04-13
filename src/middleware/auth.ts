@@ -30,3 +30,13 @@ export const authenticateToken = async (
     return res.status(401).json({ message: "Invalid token" });
   }
 };
+export const authorizeAdmin = (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Admins only" });
+  }
+  next();
+};

@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { db } from "../db/connection";
 import { Login, NewUser, users } from "../db/schema";
 import { generateToken } from "../utils/jwt";
@@ -11,7 +11,25 @@ export const register = async (
   res: Response,
 ) => {
   try {
-    const { age, email, name, password } = req.body;
+    const { age, email, name, password, role } = req.body as {
+      age?: number;
+      email?: string;
+      name?: string;
+      password?: string;
+      role?: string;
+    };
+
+    // Basic validation
+    if (
+      typeof age !== "number" ||
+      typeof email !== "string" ||
+      typeof name !== "string" ||
+      typeof password !== "string"
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Missing or invalid fields in request body" });
+    }
 
     // hash password
     const hashedPassword = await hashPassword(password);
@@ -23,18 +41,26 @@ export const register = async (
         name,
         email,
         age,
+        role: (role ?? "user") as "admin" | "user",
         password: hashedPassword,
       })
       .returning({
         id: users.id,
         name: users.name,
         email: users.email,
+        role: users.role,
       });
+
+    if (!newUser) {
+      return res.status(500).json({ message: "Error creating user" });
+    }
+
     //generate JWT
     const token = await generateToken({
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
+      role: newUser.role,
     });
     res
       .status(201)
@@ -62,6 +88,7 @@ export const login = async (req: Request<any, any, Login>, res: Response) => {
       id: user.id,
       email: user.email,
       name: user.name,
+      role: user.role,
     });
     return res.status(200).json({ message: "Login success", user, token });
   } catch (e) {

@@ -5,16 +5,16 @@ import { users, taskTags, tasks, tags } from "./schema";
 async function seed() {
   console.log("starting database seed ...");
   try {
-    //clear existing data
+    // clear existing data
     console.log("clearing existing tables");
     await db.delete(taskTags);
     await db.delete(tags);
     await db.delete(tasks);
     await db.delete(users);
 
-    //create demo users
+    // create demo users
     console.log("creating demo users");
-    const [demoUser] = await db
+    const insertedUsers = await db
       .insert(users)
       .values([
         {
@@ -44,8 +44,12 @@ async function seed() {
       ])
       .returning();
 
-    //create demo tasks
-    const [demoTasks] = await db
+    const demoUser = insertedUsers[0];
+    if (!demoUser) throw new Error("Failed to create demo user"); // ← null check
+
+    // create demo tasks
+    console.log("creating demo tasks");
+    const insertedTasks = await db
       .insert(tasks)
       .values([
         {
@@ -62,31 +66,42 @@ async function seed() {
         },
         {
           summary: "Do assignment",
-          details: "COmplete the TypeScript assignment",
+          details: "Complete the TypeScript assignment",
           completed: false,
           userId: demoUser.id,
         },
       ])
       .returning();
-    console.log("database seed completed");
+
+    const demoTask = insertedTasks[0];
+    if (!demoTask) throw new Error("Failed to create demo tasks"); // ← null check
+
+    // create demo tags
+    console.log("creating demo tags");
     const insertedTags = await db
       .insert(tags)
       .values([
-        { name: "FE", color: "green" },
-        { name: "DevOps", color: "orange" },
-        { name: "BE", color: "red" },
-        { name: "UI/UX", color: "purple" },
+        { name: "FE", color: "#00FF00" },
+        { name: "DevOps", color: "#FFA500" },
+        { name: "BE", color: "#FF0000" },
+        { name: "UI/UX", color: "#800080" },
       ])
       .returning();
 
-    // Demo task tag
-    const [demoTaskTag] = await db
+    const firstTag = insertedTags[0];
+    if (!firstTag) throw new Error("Failed to create demo tags"); // ← null check
+
+    // create demo task tag
+    console.log("creating demo task tags");
+    await db
       .insert(taskTags)
       .values({
-        taskId: demoTasks.id,
-        tagId: insertedTags[0].id,
+        taskId: demoTask.id,
+        tagId: firstTag.id,
       })
       .returning();
+
+    console.log("database seed completed");
   } catch (e) {
     console.error(e);
   }

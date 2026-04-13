@@ -6,17 +6,20 @@ import {
   boolean,
   integer,
   unique,
+  pgEnum,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import * as z from "zod";
 
+export const roleEnum = pgEnum("role", ["admin", "user"]);
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: varchar("name", { length: 100 }).notNull().unique(),
   email: varchar("email", { length: 255 }).notNull().unique(),
   password: varchar("password", { length: 255 }).notNull(),
   age: integer("age").notNull(),
+  role: roleEnum("role").notNull().default("user"),
 });
 
 export const tasks = pgTable("tasks", {
@@ -86,7 +89,7 @@ export const insertUserSchema = createInsertSchema(users)
     password: z.string().min(8, "Password must be at least 8 characters"),
     age: z.number().min(18, "Must be at least 18 years old"),
   })
-  .omit({ id: true });
+  .omit({ id: true, role: true }); 
 
 export type NewUser = z.infer<typeof insertUserSchema>;
 //updating User Schema
@@ -98,6 +101,7 @@ export const updateUserSchema = createInsertSchema(users)
     age: z.number().min(18, "Must be at least 18 years old"),
   })
   .partial()
+  .omit({ role: true })
   .extend({
     id: z.string(),
   });

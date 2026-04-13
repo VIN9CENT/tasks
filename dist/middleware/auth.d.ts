@@ -1,0 +1,8 @@
+import { Request, Response, NextFunction } from "express";
+import { JWTPayload } from "../utils/jwt";
+export interface AuthenticatedRequest extends Request {
+    user?: JWTPayload;
+}
+export declare const authenticateToken: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<Response<any, Record<string, any>> | undefined>;
+export declare const authorizeAdmin: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Response<any, Record<string, any>> | undefined;
+//# sourceMappingURL=auth.d.ts.map

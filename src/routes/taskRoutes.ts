@@ -1,36 +1,33 @@
 import { Router } from "express";
 import * as taskController from "../controllers/taskController";
 import { validateBody, validateParams } from "../middleware/validation";
-import { insertTaskSchema, taskIdSchema,updateTaskSchema} from "../db/schema";
-import { authenticateToken } from "../middleware/auth";
-
+import { insertTaskSchema, taskIdSchema, updateTaskSchema } from "../db/schema";
+import { authenticateToken, authorizeAdmin } from "../middleware/auth";
 
 const router = Router();
 
-router.use(authenticateToken)
-// GET /tasks
-router.get("/", taskController.getAllTasks);
-// GET /tasks/:id
-router.get("/:id", validateParams(taskIdSchema), taskController.getTaskById);
-
-// POST /tasks
-router.post("/", validateBody(insertTaskSchema), taskController.createTask);
-
-// PATCH /tasks/:id
+// user routes — any logged-in user
+router.get("/me", authenticateToken, taskController.getMyTasks);
+router.post("/", authenticateToken, validateBody(insertTaskSchema), taskController.createTask);
 router.patch(
   "/:id",
-    validateParams(taskIdSchema),
-    validateBody(updateTaskSchema),
+  authenticateToken,
+  validateParams(taskIdSchema),
+  validateBody(updateTaskSchema),
   taskController.updateTask,
 );
-
-//Delete task
-router.delete("/:id", validateParams(taskIdSchema), taskController.deleteTask);
-export default router;
-//replace task - PUT /tasks/:id
 router.put(
   "/:id",
+  authenticateToken,
   validateParams(taskIdSchema),
   validateBody(insertTaskSchema),
   taskController.replaceTask,
 );
+router.delete("/:id", authenticateToken, validateParams(taskIdSchema), taskController.deleteTask);
+
+// admin routes — token + admin role required
+router.get("/", authenticateToken, authorizeAdmin, taskController.getAllTasks);
+router.get("/:id", authenticateToken, authorizeAdmin, validateParams(taskIdSchema), taskController.getTaskById);
+router.delete("/:id/force", authenticateToken, authorizeAdmin, validateParams(taskIdSchema), taskController.adminDeleteTask);
+
+export default router;
