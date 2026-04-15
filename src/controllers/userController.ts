@@ -4,7 +4,6 @@ import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { AuthenticatedRequest } from "../middleware/auth";
 
-
 export const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const allUsers = await db.query.users.findMany({
@@ -41,6 +40,9 @@ export const getMyTasks = async (req: AuthenticatedRequest, res: Response) => {
 
     const userWithTasks = await db.query.users.findFirst({
       where: eq(users.id, userId!),
+      columns: {
+        password: false,
+      },
       with: {
         tasks: { with: { taskTags: { with: { tag: true } } } },
       },
@@ -59,6 +61,9 @@ export const getUserTasks = async (req: Request, res: Response) => {
   try {
     const userWithTasks = await db.query.users.findFirst({
       where: eq(users.id, id),
+      columns: {
+        password: false,
+      },
       with: {
         tasks: { with: { taskTags: { with: { tag: true } } } },
       },
@@ -74,13 +79,15 @@ export const getUserTasks = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params as { id: string };
+
   const [updated] = await db
     .update(users)
     .set(req.body)
     .where(eq(users.id, id))
     .returning();
   if (!updated) return res.status(404).json({ message: "User not found" });
-  res.json(updated);
+  const { password, ...userWithoutPassword } = updated;
+  res.json(userWithoutPassword);
 };
 
 export const deleteUser = async (req: Request, res: Response) => {
