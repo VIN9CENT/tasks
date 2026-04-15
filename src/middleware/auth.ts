@@ -33,10 +33,13 @@ export const authenticateToken = async (
 export const authorizeAdmin = (
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction,
+  next: NextFunction
 ) => {
-  if (req.user?.role !== "admin") {
-    return res.status(403).json({ message: "Admins only" });
+  if (!req.user) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Forbidden" });
   }
   next();
 };

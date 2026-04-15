@@ -1,8 +1,7 @@
-import { Router, Request, Response } from "express";
-import { register } from "../controllers/authController";
+import { Router} from "express";
+import { register, login } from "../controllers/authController";
 import { insertUserSchema, loginSchema } from "../db/schema";
 import { validateBody } from "../middleware/validation";
-import { login } from "../controllers/authController";
 
 const router = Router();
 

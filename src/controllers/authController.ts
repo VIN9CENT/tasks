@@ -11,37 +11,31 @@ export const register = async (
   res: Response,
 ) => {
   try {
-    const { age, email, name, password, role } = req.body as {
+    const { age, email, name, password } = req.body as {
       age?: number;
       email?: string;
       name?: string;
       password?: string;
-      role?: string;
     };
 
-    // Basic validation
     if (
       typeof age !== "number" ||
       typeof email !== "string" ||
       typeof name !== "string" ||
       typeof password !== "string"
     ) {
-      return res
-        .status(400)
-        .json({ message: "Missing or invalid fields in request body" });
+      return res.status(400).json({ message: "Missing or invalid fields in request body" });
     }
 
-    // hash password
     const hashedPassword = await hashPassword(password);
 
-    //create user
     const [newUser] = await db
       .insert(users)
       .values({
         name,
         email,
         age,
-        role: (role ?? "user") as "admin" | "user",
+        role: "user", // ← always hardcoded, never from body
         password: hashedPassword,
       })
       .returning({
@@ -55,16 +49,14 @@ export const register = async (
       return res.status(500).json({ message: "Error creating user" });
     }
 
-    //generate JWT
     const token = await generateToken({
       id: newUser.id,
       name: newUser.name,
       email: newUser.email,
       role: newUser.role,
     });
-    res
-      .status(201)
-      .json({ message: "User created successfully", user: newUser, token });
+
+    res.status(201).json({ message: "User created successfully", user: newUser, token });
   } catch (e) {
     res.status(500).json({ message: "Error registering user" });
     console.error(e);
@@ -77,22 +69,23 @@ export const login = async (req: Request<any, any, Login>, res: Response) => {
     const user = await db.query.users.findFirst({
       where: eq(users.email, email),
     });
-    if (!user) {
-      return res.status(401).json({ message: "invalid credential" });
-    }
+
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
+
     const isValidPassword = await comparePassword(password, user.password);
-    if (!isValidPassword) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    if (!isValidPassword) return res.status(401).json({ message: "Invalid credentials" });
+
     const token = await generateToken({
       id: user.id,
       email: user.email,
       name: user.name,
       role: user.role,
     });
-    return res.status(200).json({ message: "Login success", user, token });
+
+    const { password: _password, ...userWithoutPassword } = user;
+
+    return res.status(200).json({ message: "Login success", user: userWithoutPassword, token });
   } catch (e) {
     res.status(500).json({ message: "Error logging in user" });
-    console.error(e);
   }
 };

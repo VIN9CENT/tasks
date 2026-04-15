@@ -89,7 +89,7 @@ export const insertUserSchema = createInsertSchema(users)
     password: z.string().min(8, "Password must be at least 8 characters"),
     age: z.number().min(18, "Must be at least 18 years old"),
   })
-  .omit({ id: true, role: true }); 
+  .omit({ id: true, role: true });
 
 export type NewUser = z.infer<typeof insertUserSchema>;
 //updating User Schema

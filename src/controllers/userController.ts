@@ -4,9 +4,14 @@ import { users } from "../db/schema";
 import { eq } from "drizzle-orm";
 import { AuthenticatedRequest } from "../middleware/auth";
 
+
 export const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const allUsers = await db.query.users.findMany();
+    const allUsers = await db.query.users.findMany({
+      columns: {
+        password: false,
+      },
+    });
     res.status(200).json(allUsers);
   } catch (e) {
     res.status(500).json({ error: "Failed to fetch users" });
@@ -16,11 +21,12 @@ export const getAllUsers = async (req: AuthenticatedRequest, res: Response) => {
 export const getMe = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const userId = req.user?.id;
-
     const user = await db.query.users.findFirst({
       where: eq(users.id, userId!),
+      columns: {
+        password: false,
+      },
     });
-
     if (!user) return res.status(404).json({ message: "User not found" });
     res.status(200).json(user);
   } catch (e) {
