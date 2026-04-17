@@ -48,14 +48,19 @@ export const getTaskById = async (req: Request, res: Response) => {
 // USER: create task — userId always from token, never from body
 export const createTask = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user?.id;
-  const { summary, details } = req.body;
+
+  // Destructure ONLY the fields a user is allowed to provide
+  const { summary, details } = req.body; 
+
+  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+
   try {
     const [newTask] = await db
       .insert(tasks)
       .values({
         summary,
         details,
-        userId: userId!, // ← forced from token
+        userId: userId, // Always forced from the authenticated token
         completed: false,
       })
       .returning();
@@ -96,21 +101,23 @@ export const updateTask = async (req: AuthenticatedRequest, res: Response) => {
 };
 
 // USER: replace only their own task
+
 export const replaceTask = async (req: AuthenticatedRequest, res: Response) => {
   const { id } = req.params as { id: string };
   const userId = req.user?.id;
+  const { summary, details, completed } = req.body; // Destructure only what is allowed
+
   try {
     const task = await db.query.tasks.findFirst({
       where: eq(tasks.id, id),
     });
 
     if (!task) return res.status(404).json({ message: "Task not found" });
-    if (task.userId !== userId)
-      return res.status(403).json({ message: "Not your task" }); // ← ownership check
+    if (task.userId !== userId) return res.status(403).json({ message: "Not your task" });
 
     const [updatedTask] = await db
       .update(tasks)
-      .set(req.body)
+      .set({ summary, details, completed }) // Explicit fields only
       .where(eq(tasks.id, id))
       .returning();
 
