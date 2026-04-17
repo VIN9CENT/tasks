@@ -26,7 +26,7 @@ export const tasks = pgTable("tasks", {
   id: uuid("id").primaryKey().defaultRandom(),
   summary: text("summary").notNull(),
   details: text("details"),
-  completed: boolean("completed").notNull().default(false),
+  completed: boolean("completed").default(false),
   userId: uuid("user_id")
     .notNull()
     .references(() => users.id, {
