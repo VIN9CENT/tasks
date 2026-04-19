@@ -13,7 +13,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@neondatabase/serverless": "^1.0.2",
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.1",
     "drizzle-orm": "^0.45.2",
@@ -21,6 +20,7 @@
     "express": "^5.2.1",
     "jose": "^6.2.2",
     "pg": "^8.20.0",
+    "postgres": "^3.4.9",
     "zod": "^4.3.6"
   },
   "devDependencies": {
