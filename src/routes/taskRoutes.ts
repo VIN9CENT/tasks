@@ -30,4 +30,9 @@ router.get("/", authenticateToken, authorizeAdmin, taskController.getAllTasks);
 router.get("/:id", authenticateToken, authorizeAdmin, validateParams(taskIdSchema), taskController.getTaskById);
 router.delete("/:id/force", authenticateToken, authorizeAdmin, validateParams(taskIdSchema), taskController.adminDeleteTask);
 
+
+// user — manage tags on their own tasks
+router.post("/:taskId/tags/:tagId", authenticateToken, taskController.addTagToTask);
+router.delete("/:taskId/tags/:tagId", authenticateToken, taskController.removeTagFromTask);
+
 export default router;

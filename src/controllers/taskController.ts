@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { db } from "../db/connection";
-import { eq } from "drizzle-orm";
-import { tasks } from "../db/schema";
+import { eq, and } from "drizzle-orm";
+import { tags, tasks, taskTags } from "../db/schema";
 import { AuthenticatedRequest } from "../middleware/auth";
 
 // ADMIN: get all tasks across all users
@@ -50,7 +50,7 @@ export const createTask = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.user?.id;
 
   // Destructure ONLY the fields a user is allowed to provide
-  const { summary, details } = req.body; 
+  const { summary, details } = req.body;
 
   if (!userId) return res.status(401).json({ error: "Unauthorized" });
 
@@ -113,7 +113,8 @@ export const replaceTask = async (req: AuthenticatedRequest, res: Response) => {
     });
 
     if (!task) return res.status(404).json({ message: "Task not found" });
-    if (task.userId !== userId) return res.status(403).json({ message: "Not your task" });
+    if (task.userId !== userId)
+      return res.status(403).json({ message: "Not your task" });
 
     const [updatedTask] = await db
       .update(tasks)
@@ -167,5 +168,75 @@ export const adminDeleteTask = async (req: Request, res: Response) => {
       .json({ message: "Task deleted successfully", task: deletedTask });
   } catch (e) {
     res.status(500).json({ error: "Delete failed" });
+  }
+};
+
+// USER: add a tag to their own task
+export const addTagToTask = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const userId = req.user?.id;
+    const taskId = req.params.taskId as string; // ← explicit cast
+    const tagId = req.params.tagId as string;
+
+    // check task belongs to user
+    const task = await db.query.tasks.findFirst({
+      where: eq(tasks.id, taskId),
+    });
+
+    if (!task) return res.status(404).json({ message: "Task not found" });
+    if (task.userId !== userId)
+      return res.status(403).json({ message: "Not your task" });
+
+    // check tag exists
+    const tag = await db.query.tags.findFirst({
+      where: eq(tags.id, tagId),
+    });
+
+    if (!tag) return res.status(404).json({ message: "Tag not found" });
+
+    // link tag to task
+    const [taskTag] = await db
+      .insert(taskTags)
+      .values({ taskId, tagId })
+      .returning();
+
+    res.status(201).json(taskTag);
+  } catch (e) {
+    res.status(500).json({ error: "Could not add tag to task" });
+  }
+};
+
+// USER: remove a tag from their own task
+export const removeTagFromTask = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+      const userId = req.user?.id;
+    const taskId = req.params.taskId as string;  // ← explicit cast
+    const tagId = req.params.tagId as string;  
+    // check task belongs to user
+    const task = await db.query.tasks.findFirst({
+      where: eq(tasks.id, taskId),
+    });
+
+    if (!task) return res.status(404).json({ message: "Task not found" });
+    if (task.userId !== userId)
+      return res.status(403).json({ message: "Not your task" });
+
+    const [deleted] = await db
+      .delete(taskTags)
+      .where(and(eq(taskTags.taskId, taskId), eq(taskTags.tagId, tagId)))
+      .returning();
+
+    if (!deleted)
+      return res.status(404).json({ message: "Tag not on this task" });
+
+    res.json({ message: "Tag removed from task" });
+  } catch (e) {
+    res.status(500).json({ error: "Could not remove tag from task" });
   }
 };
