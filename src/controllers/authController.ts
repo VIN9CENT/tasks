@@ -6,18 +6,14 @@ import { hashPassword } from "../utils/password";
 import { eq } from "drizzle-orm";
 import { comparePassword } from "../utils/password";
 
+
+
 export const register = async (
   req: Request<any, any, NewUser>,
   res: Response,
 ) => {
   try {
-    const { age, email, name, password } = req.body as {
-      age?: number;
-      email?: string;
-      name?: string;
-      password?: string;
-    };
-
+    const { age, email, name, password } = req.body as NewUser
     if (
       typeof age !== "number" ||
       typeof email !== "string" ||
